@@ -9,30 +9,34 @@ public class Main {
         } else if(args.length == 1 && args[0].equals("interactive"))
             executeInteractively();
         else if(args.length == 3)
-            handleCommandLine(args);
+            performOperation(args);
         else
             System.out.println("Please provide an operation code and 2 numeric values");
     }
 
     private static void performCalculations() {
         MathEquation[] equations = new MathEquation[4];
-        equations[0] = new MathEquation('d', 100.0d, 50.0d);
-        equations[1] = new MathEquation('a', 25.0d, 92.0d);
-        equations[2] = new MathEquation('s', 225.0d, 17.0d);
-        equations[3] = new MathEquation('m', 11.0d, 3.0d);
+        equations[0] = new MathEquation(MathOperation.DIVIDE, 100.0d, 50.0d);
+        equations[1] = new MathEquation(MathOperation.ADD, 25.0d, 92.0d);
+        equations[2] = new MathEquation(MathOperation.SUBTRACT, 225.0d, 17.0d);
+        equations[3] = new MathEquation(MathOperation.MULTIPLY, 11.0d, 3.0d);
 
-        for(MathEquation equation: equations) {
+        for (MathEquation equation : equations) {
             equation.execute();
-            System.out.println("result = " + equation.result);
+            System.out.println(equation); // println will call toString()
         }
 
         System.out.println("Average result = " + MathEquation.getAverageResult());
+        executeInteractively();
+//        useOverloads();
+    }
 
+    static void useOverloads() {
         System.out.println();
         System.out.println("Using execute overloads");
         System.out.println();
 
-        MathEquation equationOverload = new MathEquation('d');
+        MathEquation equationOverload = new MathEquation(MathOperation.DIVIDE);
         double leftDouble = 9.0d;
         double rightDouble = 4.0d;
         equationOverload.execute(leftDouble, rightDouble);
@@ -42,9 +46,7 @@ public class Main {
         int rightInt = 4;
         equationOverload.execute(leftInt, rightInt);
         System.out.println("Overload results with ints: " + equationOverload.getResult());
-
     }
-
 
     static void executeInteractively() {
         System.out.println("Enter an operation and two numbers");
@@ -56,84 +58,91 @@ public class Main {
     }
 
     static void performOperation(String[] parts) {
-        char opCode = opCodeFromString(parts[0]);
+        MathOperation opCode = MathOperation.valueOf(parts[0].toUpperCase());
         double leftVal = valueFromWord(parts[1]);
         double rightVal = valueFromWord(parts[2]);
-        double result = execute(opCode, leftVal, rightVal);
-        displayResult(opCode, leftVal, rightVal, result);
+        MathEquation equation = new MathEquation(opCode, leftVal, rightVal);
+        equation.execute();
+        System.out.println(equation);
     }
 
-    private static void displayResult(char opCode, double leftVal, double rightVal, double result) {
-        char symbol = symbolFromOpCode(opCode);
-        StringBuilder builder = new StringBuilder(20);
-        builder.append(leftVal);
-        builder.append(" ");
-        builder.append(symbol);
-        builder.append(" ");
-        builder.append(rightVal);
-        builder.append(" = ");
-        builder.append(result);
-        String output = builder.toString();
-        System.out.println(output);
+//    private static void displayResult(char opCode, double leftVal, double rightVal, double result) {
+//        char symbol = symbolFromOpCode(opCode);
+//        StringBuilder builder = new StringBuilder(20);
+//        builder.append(leftVal);
+//        builder.append(" ");
+//        builder.append(symbol);
+//        builder.append(" ");
+//        builder.append(rightVal);
+//        builder.append(" = ");
+//        builder.append(result);
+//        String output = builder.toString();
+//        System.out.println(output);
+//
+//    }
 
-    }
+//    private static void handleCommandLine(String[] args) {
+//        char opCode = args[0].charAt(0);
+//        double leftVal = Double.parseDouble(args[1]);
+//        double rightVal = Double.parseDouble(args[2]);
+//        double result = execute(opCode, leftVal, rightVal);
+//        System.out.println(result);
+//    }
 
-    private static char symbolFromOpCode(char opCode) {
-        char[] opCodes = {'a', 's', 'm', 'd'};
-        char[] symbols = {'+', '-', '*', '/'};
-        char symbol = ' ';
-        for(int index = 0; index < opCodes.length; index++) {
-            if(opCode == opCodes[index]) {
-                symbol = symbols[index];
-                break;
-            }
-        }
-        return symbol;
-    }
+//    private static double execute(char opCode, double leftVal, double rightVal) {
+//        double result = 0;
+//        switch (opCode) {
+//            case 'a':
+//                result = leftVal + rightVal;
+//                break;
+//            case 's':
+//                result = leftVal - rightVal;
+//                break;
+//            case 'm':
+//                result = leftVal * rightVal;
+//                break;
+//            case 'd':
+//                result = rightVal != 0  ? leftVal / rightVal : 0.0d;
+//                break;
+//        }
+//        return result;
+//    }
 
-    private static void handleCommandLine(String[] args) {
-        char opCode = args[0].charAt(0);
-        double leftVal = Double.parseDouble(args[1]);
-        double rightVal = Double.parseDouble(args[2]);
-        double result = execute(opCode, leftVal, rightVal);
-        System.out.println(result);
-    }
+//    private static char symbolFromOpCode(char opCode) {
+//        char[] opCodes = {'a', 's', 'm', 'd'};
+//        char[] symbols = {'+', '-', '*', '/'};
+//        char symbol = ' ';
+//        for(int index = 0; index < opCodes.length; index++) {
+//            if(opCode == opCodes[index]) {
+//                symbol = symbols[index];
+//                break;
+//            }
+//        }
+//        return symbol;
+//    }
 
-    private static double execute(char opCode, double leftVal, double rightVal) {
-        double result = 0;
-        switch (opCode) {
-            case 'a':
-                result = leftVal + rightVal;
-                break;
-            case 's':
-                result = leftVal - rightVal;
-                break;
-            case 'm':
-                result = leftVal * rightVal;
-                break;
-            case 'd':
-                result = rightVal != 0  ? leftVal / rightVal : 0.0d;
-                break;
-        }
-        return result;
-    }
-
-    static char opCodeFromString(String operationName) {
-        char opCode = operationName.charAt(0);
-        return opCode;
-    }
+//    static char opCodeFromString(String operationName) {
+//        char opCode = operationName.charAt(0);
+//        return opCode;
+//    }
 
     static double valueFromWord(String word) {
         String[] numberWords = {
                 "zero", "one", "two", "three", "four",
                 "five", "six", "seven", "eight", "nine"
         };
+        boolean isValueSet = false;
         double value = 0d;
         for(int index = 0; index < numberWords.length; index++) {
             if(word.equals(numberWords[index])) {
                 value = index;
+                isValueSet = true;
                 break;
             }
+        }
+
+        if (!isValueSet) {
+            value = Double.parseDouble(word);
         }
         return value;
     }
